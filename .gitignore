@@ -1,6 +1,6 @@
 # ignore separate files
-.v.bak
-.sv.bak
+*.v.bak
+*.sv.bak
 
 # ignore unnesesary folders
 project plan/

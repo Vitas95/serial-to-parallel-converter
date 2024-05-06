@@ -1,4 +1,4 @@
-# Serial to parralel converter
+# Serial to paralel converter
 This project contains a Serial to Parallel Converter (SPC) module that was designed to control several ADI Digital to Analog Converters (DAC) simultaneously.
 
 ## Motivation

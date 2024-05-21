@@ -19,9 +19,9 @@
 // - TESTBENCH if high configure module for testbench.
 
 module main #(
-  parameter DACN = 2,
+  parameter DACN         = 2,
   parameter CLKS_PER_BIT = 9,
-  parameter TESTBENCH = 0
+  parameter TESTBENCH    = 0
 ) (  
   // General purpose ports
   input  clk,
@@ -40,11 +40,11 @@ module main #(
   input  [DACN-1:0]	dac_busy_n,
   
   output [DACN-1:0]	dac_sdo, 
-							dac_sclk, 
-							dac_sync_n, 
-							dac_reset_n, 
-							dac_clr_n,
-							dac_ldac_n
+                    dac_sclk, 
+                    dac_sync_n, 
+                    dac_reset_n, 
+                    dac_clr_n,
+                    dac_ldac_n
 );
 
 
@@ -57,11 +57,11 @@ logic reset_user;
 logic reset_button_pressed;
 logic reset_button_pressed_q;
 
-genvar 	geni;
+genvar geni;
 
 // Connections between uart and control
 logic [7:0]	uart_rx_data;
-logic			uart_byte_ready;
+logic			  uart_byte_ready;
 logic [7:0] uart_tx_data;
 
 // Connetions between control and spi
@@ -79,9 +79,9 @@ wire [23:0] 		fifo_data_out[0:DACN-1];
 wire [DACN-1:0]	fifo_read_data;
 
 // Debugging interface
-assign on_led = 0;
+assign on_led             = 0;
 assign fifo_empty_led_and = &fifo_empty;
-assign fifo_empty_led_or = |fifo_empty;
+assign fifo_empty_led_or  = |fifo_empty;
 
 // Pll is used in design only. When it's testbench 
 // clock should be driven manualy.
@@ -90,10 +90,10 @@ generate
     pll_250_kHz pll_250_kHz_m (
       .areset	(reset),
       .inclk0	(clk),
-      .c0		(clk_uart),
-	   .c1		(clk_control),
+      .c0		  (clk_uart),
+      .c1		  (clk_control),
       .locked	(pll_locked)
-  );
+    );
   end
 endgenerate
   
@@ -101,39 +101,39 @@ endgenerate
 button button_m (
   .button_in	(reset_button),
   .clock			(clk),
-  .out			(reset_button_pressed)
+  .out			  (reset_button_pressed)
 );
 
 // Reset processing
 always @(posedge clk_control) begin
-  pll_locked_q <= pll_locked;
+  pll_locked_q           <= pll_locked;
   reset_button_pressed_q <= reset_button_pressed;
 end
 
-assign pll_reset = pll_locked & ~pll_locked_q;
+assign pll_reset  = pll_locked & ~pll_locked_q;
 assign reset_user = reset_button_pressed & ~reset_button_pressed_q;
-assign reset = reset_user | pll_reset;
+assign reset      = reset_user | pll_reset;
 
 // UART modules
 uart_receiver #(
   .CLKS_PER_BIT(CLKS_PER_BIT)
 ) uart_receiver_m (
-  .rx				  (uart_rx),
-  .clock			  (clk_uart),
-  .reset			  (reset),
+  .rx				     (uart_rx),
+  .clock			   (clk_uart),
+  .reset			   (reset),
   .rx_byte_ready (uart_byte_ready),
-  .rx_data		  (uart_rx_data)
+  .rx_data		   (uart_rx_data)
 );
 
 uart_transmitter #(
   .CLKS_PER_BIT(CLKS_PER_BIT)
 ) uart_transmitter_m (
-  .clock			   (clk_uart),
-  .reset			   (reset),
-  .data				(uart_tx_data),
+  .clock			    (clk_uart),
+  .reset			    (reset),
+  .data				    (uart_tx_data),
   .start_transmit (uart_start_transmit),
-  .tx				   (uart_tx),
-  .tx_busy			(uart_tx_busy)
+  .tx				      (uart_tx),
+  .tx_busy			  (uart_tx_busy)
 );
 
 // SPI modules
@@ -144,13 +144,13 @@ generate
       .reset	(reset),
 		
 		// FIFO connection
-      .data			(fifo_data_out[geni]),
-		.fifo_read	(fifo_read_data[geni]),
-		.fifo_empty (fifo_empty[geni]),
+      .data			  (fifo_data_out[geni]),
+      .fifo_read	(fifo_read_data[geni]),
+      .fifo_empty (fifo_empty[geni]),
 		
 		// Control module
       .start_transmit	(spi_start_transmit[geni]),
-		.spi_busy			(spi_busy[geni]),
+      .spi_busy			  (spi_busy[geni]),
 		
 		// DAC connetcion
       .sdo		(dac_sdo[geni]),
@@ -171,7 +171,7 @@ generate
       .write_data	(fifo_write_data[geni]),
       .data_in		(fifo_data_in[geni]),
       .read_data	(fifo_read_data[geni]),
-      .data_out	(fifo_data_out[geni]),
+      .data_out	  (fifo_data_out[geni]),
   
       // Status outputs
       .full		(fifo_full[geni]),
@@ -186,11 +186,11 @@ control #(.DACN(DACN)) control_m (
   .reset	(reset),
   
   // UART ports
-  .uart_rx_data			(uart_rx_data),
+  .uart_rx_data			  (uart_rx_data),
   .uart_rx_byte_ready	(uart_byte_ready),
-  .uart_tx_data			(uart_tx_data),
+  .uart_tx_data			  (uart_tx_data),
   .uart_tx_transmit		(uart_start_transmit),
-  .uart_tx_busy			(uart_tx_busy),
+  .uart_tx_busy			  (uart_tx_busy),
  
   // FIFO memory ports
   .fifo_data	(fifo_data_in),
@@ -199,14 +199,14 @@ control #(.DACN(DACN)) control_m (
   .fifo_empty	(fifo_empty),
   
   // SPI control ports
-  .spi_busy					(spi_busy),
+  .spi_busy					  (spi_busy),
   .spi_start_transmit	(spi_start_transmit),
   
   // Direct to DACs
-  .dac_clr_n	(dac_clr_n),
+  .dac_clr_n	  (dac_clr_n),
   .dac_reset_n	(dac_reset_n),
-  .dac_ldac_n	(dac_ldac_n),
-  .dac_busy_n	(dac_busy_n)
+  .dac_ldac_n	  (dac_ldac_n),
+  .dac_busy_n	  (dac_busy_n)
 );
 
 endmodule

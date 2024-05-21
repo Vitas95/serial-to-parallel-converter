@@ -19,8 +19,8 @@ reg [15:0] counter;
 //// Conditions
 wire increment = button_in_q & ~&counter;
 wire decrement = ~button_in_q & |counter;
-wire set_rs = &counter;
-wire reset_rs = ~|counter; 
+wire set_rs    = &counter;
+wire reset_rs  = ~|counter; 
 
 always @(posedge clock) begin
     button_in_q <= button_in;

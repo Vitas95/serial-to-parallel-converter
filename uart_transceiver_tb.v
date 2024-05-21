@@ -10,42 +10,43 @@ module uart_transceiver_tb;
 // Testbench uses a 1 MHz clock
 // Baud rate of the UART is 115200
 // CLOCK_PER_BIT = round(CLK_PERIOD_US * BIT_DURATION_US) = 9
-parameter CLK_PERIOD		= 1.0;	// In us
-parameter BIT_DURATION	= 8.7;	// In us
-parameter CLK_PER_BIT 	= 9;
+parameter CLK_PERIOD		  = 1.0;	// In us
+parameter BIT_DURATION	  = 8.7;	// In us
+parameter CLK_PER_BIT 	  = 9;
 parameter [7:0] TEST_BYTE = 8'b0110_1010;
 
 reg 		  clock;
 reg 		  reset;
 reg 		  rx;
-wire [7:0] data;
-wire		  ready;
-wire		  busy;
-wire 		  tx;
-reg [7:0]  rx_test = 0;
+reg [7:0] rx_test = 0;
 
-integer  i = 0;
+wire [7:0] data;
+wire		   ready;
+wire		   busy;
+wire 		   tx;
+
+integer i = 0;
 
 // Test modules
 uart_receiver #(
   .CLKS_PER_BIT(CLK_PER_BIT)
 ) receiver_dut (
-  .rx					(rx),
-  .clock				(clock),
-  .reset				(reset),
-  .rx_byte_ready	(ready),
-  .rx_data			(data)
+  .rx(rx),
+  .clock(clock),
+  .reset(reset),
+  .rx_byte_ready(ready),
+  .rx_data(data)
 );
 
 uart_transmitter #(
   .CLKS_PER_BIT(CLK_PER_BIT)
 ) transmitter_dut (
-  .clock				(clock),
-  .reset				(reset),
-  .data				(data),
-  .start_transmit	(ready),
-  .tx					(tx),
-  .tx_busy			(busy)
+  .clock(clock),
+  .reset(reset),
+  .data(data),
+  .start_transmit(ready),
+  .tx(tx),
+  .tx_busy(busy)
 );
 
 // Clock signal
@@ -56,7 +57,7 @@ task init();
   begin
     clock <= 0;
     reset <= 0;
-    rx <= 1;
+    rx    <= 1;
   end
 endtask
 
@@ -64,8 +65,8 @@ endtask
 task reset_pulse();
   begin
     reset <= 1;
-	 #(CLK_PERIOD);
-	 reset <= 0;
+	  #(CLK_PERIOD);
+	  reset <= 0;
   end
 endtask
 
@@ -74,26 +75,26 @@ task send_byte (
 	input [7:0] byte
 );
 
-  integer 	 i;
+  integer i;
   
   begin
     // Start bit
     rx <= 0;
     #(BIT_DURATION);
 	 
-	 //Sending byte
-	 for (i=0; i < 8; i=i+1) begin
-	   rx <= byte[i];
-		#(BIT_DURATION);
-	 end
+    //Sending byte
+    for (i=0; i < 8; i=i+1) begin
+	    rx <= byte[i];
+		  #(BIT_DURATION);
+    end
 	 
-	 	 // Checking if the receiving was successful.
+	 	// Checking if the receiving was successful.
     if (data == TEST_BYTE) $display("Reception succeed.");
     else $display("Reception failure!");
 	 
-	 //Stop bit
-	 rx <= 1;
-	 #(BIT_DURATION);
+    //Stop bit
+    rx <= 1;
+    #(BIT_DURATION);
   end
 endtask
 

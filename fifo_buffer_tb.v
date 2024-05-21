@@ -14,14 +14,14 @@ parameter ENDSIM = 100;
 reg 				clock;
 reg 				reset;
 reg 		 		write_enable;
-reg 	[23:0]	data_in;
-reg				read_enable;
-wire 	[23:0]	data_out;
+reg [23:0]  data_in;
+reg				  read_enable;
+
+wire [23:0]	data_out;
 wire				full;
 wire				empty;
 
 integer i = 0;
-
 
 // Test module
 fifo_buffer fifo_buffer_dut (
@@ -45,11 +45,11 @@ always #(CLK_PERIOD/2) clock <= ~clock;
 // Initialisation
 task init();
   begin
-    clock 			<= 0;
-	 reset 			<= 0;
-	 write_enable	<= 0; 
-	 read_enable	<= 0;
-	 data_in			<= 0;
+    clock 			  <= 0;
+    reset 			  <= 0;
+    write_enable	<= 0; 
+    read_enable	<= 0;
+    data_in			<= 0;
   end
 endtask
 
@@ -57,8 +57,8 @@ endtask
 task reset_pulse();
   begin
     #(CLK_PERIOD) 	reset <= 1;
-	 #(CLK_PERIOD)		reset <= 0;
-	 #(CLK_PERIOD/2);
+    #(CLK_PERIOD)		reset <= 0;
+    #(CLK_PERIOD/2);
   end
 endtask
 
@@ -66,15 +66,15 @@ endtask
 task write_data();
   begin
     write_enable <= 1;
-	 data_in <= 0;
+    data_in <= 0;
 	 
-	 for (i=0; i<31; i=i+1) begin
-	   #(CLK_PERIOD);
-		data_in <= data_in + 1'b1;
-	 end
+    for (i=0; i<31; i=i+1) begin
+      #(CLK_PERIOD);
+      data_in <= data_in + 1'b1;
+    end
 	 
-	 write_enable <= 0;
-	 data_in <= 0;
+    write_enable <= 0;
+    data_in <= 0;
   end
 endtask
 
@@ -82,25 +82,25 @@ endtask
 task read_data();
   begin
     read_enable <= 1;
-	 data_in <= 0;
+    data_in <= 0;
 	 
-	 for (i=0; i<34; i=i+1) begin
-		if (!empty) begin
-		  // Check readed data
-		  if (data_out == data_in) $display("Readed data okay.");
+    for (i=0; i<34; i=i+1) begin
+      if (!empty) begin
+        // Check readed data
+        if (data_out == data_in) $display("Readed data okay.");
         else $display("Error!");
 		
-		  // Calculate data to compare
-		  data_in <= data_in + 1'b1;
-		end else begin
-		  read_enable <= 0;
-		  $display("Buffer is empty");
-		end
+        // Calculate data to compare
+        data_in <= data_in + 1'b1;
+      end else begin
+        read_enable <= 0;
+        $display("Buffer is empty");
+      end
 		
 		#(CLK_PERIOD);
-	 end
+    end
 	 
-	 read_enable <= 0;
+    read_enable <= 0;
 	 
   end
 endtask

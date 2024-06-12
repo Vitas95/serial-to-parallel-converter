@@ -41,7 +41,7 @@ main #(
 ) main_dut (
   
   // General purpose ports
-  .clk			    (),
+  .clk_50			    (),
   .reset_button	(reset_button),
   
   // Test LEDs
@@ -66,11 +66,11 @@ main #(
 
 // Clock signals
 always #(CLK_PERIOD/2) begin
-  main_dut.clk_uart <= ~main_dut.clk_uart;
+  main_dut.clk_1 <= ~main_dut.clk_1;
 end
 
 always #(CLK_PERIOD/2) begin
-  main_dut.clk_control <= ~main_dut.clk_control;
+  main_dut.clk_1 <= ~main_dut.clk_1;
 end
 
 
@@ -78,8 +78,8 @@ end
 task init();
   begin
     reset_button <= 1;
-    main_dut.clk_uart <= 0;
-    main_dut.clk_control <= 0;
+    main_dut.clk_1 <= 0;
+    main_dut.clk_1 <= 0;
     uart_rx <= 1;
     dac_busy_n <= '1;
   end

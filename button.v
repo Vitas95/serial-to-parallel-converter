@@ -36,6 +36,6 @@ always @(posedge clock) begin
 end
 
 // Output signal
-assign out = rs_trigger & ~rs_trigger_q;
+assign out = rs_trigger;// & ~rs_trigger_q;
 
 endmodule

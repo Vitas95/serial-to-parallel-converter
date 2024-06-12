@@ -24,7 +24,7 @@ module main #(
   parameter TESTBENCH    = 0
 ) (  
   // General purpose ports
-  input  clk,
+  input  clk_50,
   input  reset_button,
   
   // Debugging outputs
@@ -49,8 +49,7 @@ module main #(
 
 
 logic	reset;
-logic clk_uart;
-logic clk_control;
+logic clk_1;
 logic pll_locked;
 logic	pll_locked_q;
 logic reset_user;
@@ -87,11 +86,9 @@ assign fifo_empty_led_or  = |fifo_empty;
 // clock should be driven manualy.
 generate
   if (TESTBENCH == 0) begin
-    pll_250_kHz pll_250_kHz_m (
-      .areset	(reset),
-      .inclk0	(clk),
-      .c0		  (clk_uart),
-      .c1		  (clk_control),
+    pll pll_1_MHz_m (
+      .inclk0	(clk_50),
+      .c0		  (clk_1),
       .locked	(pll_locked)
     );
   end
@@ -99,13 +96,13 @@ endgenerate
   
 // Reset button
 button button_m (
-  .button_in	(reset_button),
-  .clock			(clk),
+  .button_in	(~reset_button),
+  .clock			(clk_50),
   .out			  (reset_button_pressed)
 );
 
 // Reset processing
-always @(posedge clk_control) begin
+always @(posedge clk_1) begin
   pll_locked_q           <= pll_locked;
   reset_button_pressed_q <= reset_button_pressed;
 end
@@ -119,7 +116,7 @@ uart_receiver #(
   .CLKS_PER_BIT(CLKS_PER_BIT)
 ) uart_receiver_m (
   .rx				     (uart_rx),
-  .clock			   (clk_uart),
+  .clock			   (clk_1),
   .reset			   (reset),
   .rx_byte_ready (uart_byte_ready),
   .rx_data		   (uart_rx_data)
@@ -128,7 +125,7 @@ uart_receiver #(
 uart_transmitter #(
   .CLKS_PER_BIT(CLKS_PER_BIT)
 ) uart_transmitter_m (
-  .clock			    (clk_uart),
+  .clock			    (clk_1),
   .reset			    (reset),
   .data				    (uart_tx_data),
   .start_transmit (uart_start_transmit),
@@ -140,7 +137,7 @@ uart_transmitter #(
 generate
   for (geni=0; geni<DACN; geni=geni+1) begin : generate_spi_modules
     spi_transmitter spi_transmitter_m (
-      .clock	(clk_control),
+      .clock	(clk_1),
       .reset	(reset),
 		
 		// FIFO connection
@@ -164,7 +161,7 @@ endgenerate
 generate
   for (geni=0; geni<DACN; geni=geni+1) begin : generate_fifo_modules
     fifo_buffer fifo_buffer_m (
-      .clock (clk_control),
+      .clock (clk_1),
       .reset (reset),
         
       // Write and read data ports
@@ -182,7 +179,7 @@ endgenerate
 
 // Main control module
 control #(.DACN(DACN)) control_m (
-  .clock	(clk_control),
+  .clock	(clk_1),
   .reset	(reset),
   
   // UART ports

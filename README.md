@@ -54,7 +54,7 @@ SPC module followed with all modules required for its operation. The `main` modu
 | Pin| Direction | Active level | Description |
 | --- | --- | --- | --- |
 | clk | input | - | Main clock frequency of the FPGA |
-| reset_button | input | low | Show file differences that haven't been staged |
+| reset_button | input | low | Reset all modules |
 | on_led | output | low | Turns on when firmware is downloaded in FPGA |
 | fifo_empty_led_and | output | low | Turns on when all FIFO are not empty |
 | fifo_empty_led_or | output | low | Turns on when some FIFO is not empty |
